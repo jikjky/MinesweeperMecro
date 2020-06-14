@@ -1,0 +1,9 @@
+C:\Users\jikjk\source\repos\MinesweeperMecro\MinesweeperMecro\bin\Debug\MinesweeperMecro.exe.config
+C:\Users\jikjk\source\repos\MinesweeperMecro\MinesweeperMecro\bin\Debug\MinesweeperMecro.exe
+C:\Users\jikjk\source\repos\MinesweeperMecro\MinesweeperMecro\bin\Debug\MinesweeperMecro.pdb
+C:\Users\jikjk\source\repos\MinesweeperMecro\MinesweeperMecro\obj\Debug\MinesweeperMecro.csprojAssemblyReference.cache
+C:\Users\jikjk\source\repos\MinesweeperMecro\MinesweeperMecro\obj\Debug\MinesweeperMecro.Form1.resources
+C:\Users\jikjk\source\repos\MinesweeperMecro\MinesweeperMecro\obj\Debug\MinesweeperMecro.Properties.Resources.resources
+C:\Users\jikjk\source\repos\MinesweeperMecro\MinesweeperMecro\obj\Debug\MinesweeperMecro.csproj.GenerateResource.cache
+C:\Users\jikjk\source\repos\MinesweeperMecro\MinesweeperMecro\obj\Debug\MinesweeperMecro.exe
+C:\Users\jikjk\source\repos\MinesweeperMecro\MinesweeperMecro\obj\Debug\MinesweeperMecro.pdb
