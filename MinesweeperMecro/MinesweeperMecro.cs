@@ -25,6 +25,8 @@ namespace MinesweeperMecro
         }
         public Rectangle myRectangle;
 
+        public int percent;
+
         public Point ClickPoint;
 
         public bool isClick = false;
@@ -65,18 +67,6 @@ namespace MinesweeperMecro
     {
         public event Update UpdateEvent;
 
-        /*public int startX = 763;
-        public int startY = 336;
-        public int endX = 1015;
-        public int endY = 588;
-
-        public Rectangle MinesweeperSpace;
-
-        public int col = 9;
-        public int row = 9;
-
-        public int boxSize = 28;*/
-
         public int startX = 632;
         public int startY = 336;
         public int endX = 1472;
@@ -91,8 +81,7 @@ namespace MinesweeperMecro
 
         public BoxInformation[,] colInformation;
 
-        public int MineCount = 10;
-        public int findMineCount = 0;
+        public int TotalMineCount = 99;
 
         Bitmap currentImage;
 
@@ -125,7 +114,11 @@ namespace MinesweeperMecro
 
             Fail = new Bitmap("Resources//Fail.png");
 
+            Init();
+        }
 
+        public void Init()
+        {
             MinesweeperSpace = new Rectangle(startX, startY, endX - startX, endY - startY);
             colInformation = new BoxInformation[col, row];
             for (int i = 0; i < col; i++)
@@ -137,66 +130,36 @@ namespace MinesweeperMecro
                     colInformation[i, j].ClickPoint = new Point(MinesweeperSpace.X + colInformation[i, j].myRectangle.X + boxSize / 2, MinesweeperSpace.Y + colInformation[i, j].myRectangle.Y + boxSize / 2);
                 }
             }
-
         }
 
         public void Start()
         {
-            Util.MouseClick(1029 + 50, 266 + 50);
-            Thread.Sleep(100);
-            Util.MouseClick(colInformation[0, 0].ClickPoint.X, colInformation[0, 0].ClickPoint.Y);
-            Thread.Sleep(100);
-            Util.MouseClick(colInformation[col - 1, 0].ClickPoint.X, colInformation[col - 1, 0].ClickPoint.Y);
-            Thread.Sleep(100);
-            Util.MouseClick(colInformation[0, row - 1].ClickPoint.X, colInformation[0, row - 1].ClickPoint.Y);
-            Thread.Sleep(100);
-            Util.MouseClick(colInformation[col - 1, row - 1].ClickPoint.X, colInformation[col - 1, row - 1].ClickPoint.Y);
-            Thread.Sleep(100);
+            Init();
 
-            MinesweeperSpace = new Rectangle(startX, startY, endX - startX, endY - startY);
-            colInformation = new BoxInformation[col, row];
-            for (int i = 0; i < col; i++)
-            {
-                for (int j = 0; j < row; j++)
-                {
-                    colInformation[i, j] = new BoxInformation();
-                    colInformation[i, j].myRectangle = new Rectangle(i * boxSize, j * boxSize, boxSize, boxSize);
-                    colInformation[i, j].ClickPoint = new Point(MinesweeperSpace.X + colInformation[i, j].myRectangle.X + boxSize / 2, MinesweeperSpace.Y + colInformation[i, j].myRectangle.Y + boxSize / 2);
-                }
-            }
+            Util.MouseClick(1029 + 20, 266 + 20);
+            Thread.Sleep(300);
+            Util.MouseClick(colInformation[col / 2, row / 2].ClickPoint.X, colInformation[col / 2, row / 2].ClickPoint.Y);
+            Thread.Sleep(100);
 
             while (true)
             {
                 Bitmap SmileImage = Util.ClopImage(Util.PrintScreenToImage(), new Rectangle(1029,266,1073-1029,310-266));
-                if (Util.ImageCompare(SmileImage, Win))
+                /*if (Util.ImageCompare(SmileImage, Win))
                 {
+                    Init();
+                    SmileImage.Dispose();
                     break;
-                }
-                else if (Util.ImageCompare(SmileImage, Fail))
+                }   
+                else */if (Util.ImageCompare(SmileImage, Win) || Util.ImageCompare(SmileImage, Fail))
                 {
-                    Util.MouseClick(1029 + 10, 266 + 10);
-                    Thread.Sleep(100);
-                    Util.MouseClick(colInformation[0, 0].ClickPoint.X, colInformation[0, 0].ClickPoint.Y);
-                    Thread.Sleep(100);
-                    Util.MouseClick(colInformation[col - 1, 0].ClickPoint.X, colInformation[col - 1, 0].ClickPoint.Y);
-                    Thread.Sleep(100);
-                    Util.MouseClick(colInformation[0, row - 1].ClickPoint.X, colInformation[0, row - 1].ClickPoint.Y);
-                    Thread.Sleep(100);
-                    Util.MouseClick(colInformation[col - 1, row - 1].ClickPoint.X, colInformation[col - 1, row - 1].ClickPoint.Y);
-                    Thread.Sleep(100);
+                    Init();
 
-                    MinesweeperSpace = new Rectangle(startX, startY, endX - startX, endY - startY);
-                    colInformation = new BoxInformation[col, row];
-                    for (int i = 0; i < col; i++)
-                    {
-                        for (int j = 0; j < row; j++)
-                        {
-                            colInformation[i, j] = new BoxInformation();
-                            colInformation[i, j].myRectangle = new Rectangle(i * boxSize, j * boxSize, boxSize, boxSize);
-                            colInformation[i, j].ClickPoint = new Point(MinesweeperSpace.X + colInformation[i, j].myRectangle.X + boxSize / 2, MinesweeperSpace.Y + colInformation[i, j].myRectangle.Y + boxSize / 2);
-                        }
-                    }
+                    Util.MouseClick(1029 + 20, 266 + 20);
+                    Thread.Sleep(300);
+                    Util.MouseClick(colInformation[col / 2, row / 2].ClickPoint.X, colInformation[col / 2, row / 2].ClickPoint.Y);
+                    Thread.Sleep(100);
                 }
+
                 SmileImage.Dispose();
                 Update();
 
@@ -212,11 +175,14 @@ namespace MinesweeperMecro
             currentImage?.Dispose();
             currentImage = Util.ClopImage(Util.PrintScreenToImage(), MinesweeperSpace);
 
-
+            //이미지 to Memory
             for (int i = 0; i < col; i++)
             {
                 for (int j = 0; j < row; j++)
                 {
+                    //퍼센트 초기화
+                    colInformation[i, j].percent = -1;
+                    //
                     if (colInformation[i, j].myState == BoxInformation.State.NoneClick || colInformation[i, j].myState == BoxInformation.State.NeedClick)
                     {
                         Bitmap tempBitmap = Util.ClopImage(currentImage, colInformation[i, j].myRectangle);
@@ -265,6 +231,7 @@ namespace MinesweeperMecro
                     }
                 }
             }
+        //Process
         Start:
             for (int i = 0; i < col; i++)
             {
@@ -275,516 +242,11 @@ namespace MinesweeperMecro
                         NoneClick tempNoneClick = new NoneClick();
                         Mine tempMine = new Mine();
                         Empty tempEmpty = new Empty();
-                        if (i == 0 && j == 0)
-                        {
-                            if (colInformation[i + 1, j].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i + 1, j));
-                            }
-                            else if (colInformation[i + 1, j].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i + 1, j));
-                            }
-                            else if (colInformation[i + 1, j].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i + 1, j));
-                            }
-                            if (colInformation[i, j + 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i, j + 1));
-                            }
-                            else if (colInformation[i, j + 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i, j + 1));
-                            }
-                            else if (colInformation[i, j + 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i, j + 1));
-                            }
-                            if (colInformation[i + 1, j + 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i + 1, j + 1));
-                            }
-                            else if (colInformation[i + 1, j + 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i + 1, j + 1));
-                            }
-                            else if (colInformation[i + 1, j + 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i + 1, j + 1));
-                            }
-                        }
-                        else if (i == col - 1 && j == row - 1)
-                        {
-                            if (colInformation[i - 1, j - 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i - 1, j - 1));
-                            }
-                            else if (colInformation[i - 1, j - 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i - 1, j - 1));
-                            }
-                            else if (colInformation[i - 1, j - 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i - 1, j - 1));
-                            }
-                            if (colInformation[i - 1, j].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i - 1, j));
-                            }
-                            else if (colInformation[i - 1, j].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i - 1, j));
-                            }
-                            else if (colInformation[i - 1, j].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i - 1, j));
-                            }
-                            if (colInformation[i, j - 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i, j - 1));
-                            }
-                            else if (colInformation[i, j - 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i, j - 1));
-                            }
-                            else if (colInformation[i, j - 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i, j - 1));
-                            }
-                        }
-                        //
-                        else if (i == 0 && j == row - 1)
-                        {
-                            if (colInformation[i, j - 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i, j - 1));
-                            }
-                            else if (colInformation[i, j - 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i, j - 1));
-                            }
-                            else if (colInformation[i, j - 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i, j - 1));
-                            }
-                            if (colInformation[i + 1, j - 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i + 1, j - 1));
-                            }
-                            else if (colInformation[i + 1, j - 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i + 1, j - 1));
-                            }
-                            else if (colInformation[i + 1, j - 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i + 1, j - 1));
-                            }
-                            if (colInformation[i + 1, j].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i + 1, j));
-                            }
-                            else if (colInformation[i + 1, j].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i + 1, j));
-                            }
-                            else if (colInformation[i + 1, j].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i + 1, j));
-                            }
-                        }
 
-                        else if (i == col - 1 && j == 0)
-                        {
-                            if (colInformation[i - 1, j].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i - 1, j));
-                            }
-                            else if (colInformation[i - 1, j].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i - 1, j));
-                            }
-                            else if (colInformation[i - 1, j].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i - 1, j));
-                            }
-                            if (colInformation[i - 1, j + 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i - 1, j + 1));
-                            }
-                            else if (colInformation[i - 1, j + 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i - 1, j + 1));
-                            }
-                            else if (colInformation[i - 1, j + 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i - 1, j + 1));
-                            }
-                            if (colInformation[i, j + 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i, j + 1));
-                            }
-                            else if (colInformation[i, j + 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i, j + 1));
-                            }
-                            else if (colInformation[i, j + 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i, j + 1));
-                            }
-                        }
-                        //
-                        else if (i == 0)
-                        {
-                            if (colInformation[i, j - 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i, j - 1));
-                            }
-                            else if (colInformation[i, j - 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i, j - 1));
-                            }
-                            else if (colInformation[i, j - 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i, j - 1));
-                            }
-                            if (colInformation[i, j + 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i, j + 1));
-                            }
-                            else if (colInformation[i, j + 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i, j + 1));
-                            }
-                            else if (colInformation[i, j + 1].myState == BoxInformation.State.Empty ||
-                                colInformation[i, j + 1].myState == BoxInformation.State.Number
-                                )
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i, j + 1));
-                            }
-                            if (colInformation[i + 1, j - 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i + 1, j - 1));
-                            }
-                            else if (colInformation[i + 1, j - 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i + 1, j - 1));
-                            }
-                            else if (colInformation[i + 1, j - 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i + 1, j - 1));
-                            }
-                            if (colInformation[i + 1, j].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i + 1, j));
-                            }
-                            else if (colInformation[i + 1, j].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i + 1, j));
-                            }
-                            else if (colInformation[i + 1, j].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i + 1, j));
-                            }
-                            if (colInformation[i + 1, j + 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i + 1, j + 1));
-                            }
-                            else if (colInformation[i + 1, j + 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i + 1, j + 1));
-                            }
-                            else if (colInformation[i + 1, j + 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i + 1, j + 1));
-                            }
-                        }
-                        else if (j == 0)
-                        {
-                            if (colInformation[i - 1, j].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i - 1, j));
-                            }
-                            else if (colInformation[i - 1, j].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i - 1, j));
-                            }
-                            else if (colInformation[i - 1, j].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i - 1, j));
-                            }
-                            if (colInformation[i + 1, j].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i + 1, j));
-                            }
-                            else if (colInformation[i + 1, j].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i + 1, j));
-                            }
-                            else if (colInformation[i + 1, j].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i + 1, j));
-                            }
-                            if (colInformation[i - 1, j + 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i - 1, j + 1));
-                            }
-                            else if (colInformation[i - 1, j + 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i - 1, j + 1));
-                            }
-                            else if (colInformation[i - 1, j + 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i - 1, j + 1));
-                            }
-                            if (colInformation[i, j + 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i, j + 1));
-                            }
-                            else if (colInformation[i, j + 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i, j + 1));
-                            }
-                            else if (colInformation[i, j + 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i, j + 1));
-                            }
-                            if (colInformation[i + 1, j + 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i + 1, j + 1));
-                            }
-                            else if (colInformation[i + 1, j + 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i + 1, j + 1));
-                            }
-                            else if (colInformation[i + 1, j + 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i + 1, j + 1));
-                            }
-                        }
-                        else if (i == col - 1)
-                        {
-                            if (colInformation[i, j - 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i, j - 1));
-                            }
-                            else if (colInformation[i, j - 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i, j - 1));
-                            }
-                            else if (colInformation[i, j - 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i, j - 1));
-                            }
-                            if (colInformation[i, j + 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i, j + 1));
-                            }
-                            else if (colInformation[i, j + 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i, j + 1));
-                            }
-                            else if (colInformation[i, j + 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i, j + 1));
-                            }
-                            if (colInformation[i - 1, j - 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i - 1, j - 1));
-                            }
-                            else if (colInformation[i - 1, j - 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i - 1, j - 1));
-                            }
-                            else if (colInformation[i - 1, j - 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i - 1, j - 1));
-                            }
-                            if (colInformation[i - 1, j].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i - 1, j));
-                            }
-                            else if (colInformation[i - 1, j].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i - 1, j));
-                            }
-                            else if (colInformation[i - 1, j].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i - 1, j));
-                            }
-                            if (colInformation[i - 1, j + 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i - 1, j + 1));
-                            }
-                            else if (colInformation[i - 1, j + 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i - 1, j + 1));
-                            }
-                            else if (colInformation[i - 1, j + 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i - 1, j + 1));
-                            }
-                        }
-                        else if (j == row - 1)
-                        {
-                            if (colInformation[i - 1, j].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i - 1, j));
-                            }
-                            else if (colInformation[i - 1, j].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i - 1, j));
-                            }
-                            else if (colInformation[i - 1, j].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i - 1, j));
-                            }
-                            if (colInformation[i + 1, j].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i + 1, j));
-                            }
-                            else if (colInformation[i + 1, j].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i + 1, j));
-                            }
-                            else if (colInformation[i + 1, j].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i + 1, j));
-                            }
-                            if (colInformation[i - 1, j - 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i - 1, j - 1));
-                            }
-                            else if (colInformation[i - 1, j - 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i - 1, j - 1));
-                            }
-                            else if (colInformation[i - 1, j - 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i - 1, j - 1));
-                            }
-                            if (colInformation[i, j - 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i, j - 1));
-                            }
-                            else if (colInformation[i, j - 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i, j - 1));
-                            }
-                            else if (colInformation[i, j - 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i, j - 1));
-                            }
-                            if (colInformation[i + 1, j - 1].myState == BoxInformation.State.NoneClick)
-                            {
-                                tempNoneClick.NoneClickCount++;
-                                tempNoneClick.Info.Add(new ColRow(i + 1, j - 1));
-                            }
-                            else if (colInformation[i + 1, j - 1].myState == BoxInformation.State.Mine)
-                            {
-                                tempMine.MineCount++;
-                                tempMine.Info.Add(new ColRow(i + 1, j - 1));
-                            }
-                            else if (colInformation[i + 1, j - 1].myState == BoxInformation.State.Empty)
-                            {
-                                tempEmpty.EmptyCount++;
-                                tempEmpty.Info.Add(new ColRow(i + 1, j - 1));
-                            }
-                        }
-                        else
+                        //■□□
+                        //□□□
+                        //□□□
+                        if (i != 0 && j != 0)
                         {
                             if (colInformation[i - 1, j - 1].myState == BoxInformation.State.NoneClick)
                             {
@@ -801,6 +263,12 @@ namespace MinesweeperMecro
                                 tempEmpty.EmptyCount++;
                                 tempEmpty.Info.Add(new ColRow(i - 1, j - 1));
                             }
+                        }
+                        //□■□
+                        //□□□
+                        //□□□
+                        if (j != 0)
+                        {
                             if (colInformation[i, j - 1].myState == BoxInformation.State.NoneClick)
                             {
                                 tempNoneClick.NoneClickCount++;
@@ -816,6 +284,12 @@ namespace MinesweeperMecro
                                 tempEmpty.EmptyCount++;
                                 tempEmpty.Info.Add(new ColRow(i, j - 1));
                             }
+                        }
+                        //□□■
+                        //□□□
+                        //□□□
+                        if (j != 0 && i != col - 1)
+                        {
                             if (colInformation[i + 1, j - 1].myState == BoxInformation.State.NoneClick)
                             {
                                 tempNoneClick.NoneClickCount++;
@@ -831,6 +305,12 @@ namespace MinesweeperMecro
                                 tempEmpty.EmptyCount++;
                                 tempEmpty.Info.Add(new ColRow(i + 1, j - 1));
                             }
+                        }
+                        //□□□
+                        //■□□
+                        //□□□
+                        if (i != 0)
+                        {
                             if (colInformation[i - 1, j].myState == BoxInformation.State.NoneClick)
                             {
                                 tempNoneClick.NoneClickCount++;
@@ -846,6 +326,12 @@ namespace MinesweeperMecro
                                 tempEmpty.EmptyCount++;
                                 tempEmpty.Info.Add(new ColRow(i - 1, j));
                             }
+                        }
+                        //□□□
+                        //□□■
+                        //□□□
+                        if (i != col - 1)
+                        {
                             if (colInformation[i + 1, j].myState == BoxInformation.State.NoneClick)
                             {
                                 tempNoneClick.NoneClickCount++;
@@ -861,6 +347,12 @@ namespace MinesweeperMecro
                                 tempEmpty.EmptyCount++;
                                 tempEmpty.Info.Add(new ColRow(i + 1, j));
                             }
+                        }
+                        //□□□
+                        //□□□
+                        //■□□
+                        if (i != 0 && j != row - 1)
+                        {
                             if (colInformation[i - 1, j + 1].myState == BoxInformation.State.NoneClick)
                             {
                                 tempNoneClick.NoneClickCount++;
@@ -876,6 +368,12 @@ namespace MinesweeperMecro
                                 tempEmpty.EmptyCount++;
                                 tempEmpty.Info.Add(new ColRow(i - 1, j + 1));
                             }
+                        }
+                        //□□□
+                        //□□□
+                        //□■□
+                        if (j != row - 1)
+                        {
                             if (colInformation[i, j + 1].myState == BoxInformation.State.NoneClick)
                             {
                                 tempNoneClick.NoneClickCount++;
@@ -891,6 +389,12 @@ namespace MinesweeperMecro
                                 tempEmpty.EmptyCount++;
                                 tempEmpty.Info.Add(new ColRow(i, j + 1));
                             }
+                        }
+                        //□□□
+                        //□□□
+                        //□□■
+                        if (i != col - 1 && j != row - 1)
+                        {
                             if (colInformation[i + 1, j + 1].myState == BoxInformation.State.NoneClick)
                             {
                                 tempNoneClick.NoneClickCount++;
@@ -908,6 +412,7 @@ namespace MinesweeperMecro
                             }
                         }
 
+                        //Log
                         string logText = "";
                         for (int ic = 0; ic < row; ic++)
                         {
@@ -959,26 +464,50 @@ namespace MinesweeperMecro
 
                         Debug.WriteLine(logText);
 
+                        //지뢰 감지
                         if (tempNoneClick.NoneClickCount + tempMine.MineCount == colInformation[i, j].number)
                         {
                             foreach (var item in tempNoneClick.Info)
                             {
                                 colInformation[item.col, item.row].myState = BoxInformation.State.Mine;
+                                colInformation[item.col, item.row].percent = 100;
                                 goto Start;
                             }
                         }
 
+                        //지뢰 있을 확률계산
+                        if ((tempNoneClick.NoneClickCount > 0 || tempMine.MineCount > 0) && tempNoneClick.NoneClickCount != tempMine.MineCount)
+                        {
+                            int ifMine = tempNoneClick.NoneClickCount + tempMine.MineCount;
+
+                             int value = Convert.ToInt32( (float)colInformation[i, j].number / (float)ifMine * 100);
+
+                            foreach (var item in tempNoneClick.Info)
+                            {
+                                if (colInformation[item.col, item.row].percent < value)
+                                {
+                                    colInformation[item.col, item.row].percent = value;
+                                    Debug.WriteLine("col : " + item.col + "row : " + item.row + " == " + colInformation[item.col, item.row].percent);
+                                }
+                            }
+                        }
+
+                        //지뢰 없는곳
                         if (tempMine.MineCount == colInformation[i, j].number)
                         {
                             foreach (var item in tempNoneClick.Info)
                             {
                                 colInformation[item.col, item.row].myState = BoxInformation.State.NeedClick;
+                                colInformation[item.col, item.row].percent = 0;
                             }
                         }
                     }
                 }
             }
+
             int ClickCount = 0;
+            int NoneClickCount = 0;
+            int MineCount = 0;
             for (int i = 0; i < col; i++)
             {
                 for (int j = 0; j < row; j++)
@@ -988,6 +517,14 @@ namespace MinesweeperMecro
                         ClickCount++;
                         Util.MouseClick(colInformation[i, j].ClickPoint.X, colInformation[i, j].ClickPoint.Y);
                         Thread.Sleep(100);
+                    }
+                    if (colInformation[i, j].myState == BoxInformation.State.Mine)
+                    {
+                        MineCount++;
+                    }
+                    if (colInformation[i, j].myState == BoxInformation.State.NoneClick)
+                    {
+                        NoneClickCount++;
                     }
                 }
             }
@@ -1000,12 +537,38 @@ namespace MinesweeperMecro
                     {
                         if (colInformation[i, j].myState == BoxInformation.State.NoneClick)
                         {
-                            Util.MouseClick(colInformation[i, j].ClickPoint.X, colInformation[i, j].ClickPoint.Y);
-                            return;
+                            if (colInformation[i, j].percent == -1)
+                            {
+                                colInformation[i, j].percent = Convert.ToInt32(((float)TotalMineCount - (float)MineCount) / NoneClickCount * 100);
+                            }
                         }
                     }
                 }
+
+                int tempCol = 0;
+                int tempRow = 0;
+                int minPercent = 100;
+                for (int i = 0; i < col; i++)
+                {
+                    for (int j = 0; j < row; j++)
+                    {
+                        if (colInformation[i, j].percent < minPercent && colInformation[i, j].myState == BoxInformation.State.NoneClick)
+                        {
+                            tempCol = i;
+                            tempRow = j;
+                            minPercent = colInformation[i, j].percent;
+
+                            Debug.WriteLine("Min : " + colInformation[i, j].percent);
+                        }
+                    }
+                }
+
+                Util.MouseClick(colInformation[tempCol, tempRow].ClickPoint.X, colInformation[tempCol, tempRow].ClickPoint.Y);
+                Thread.Sleep(100);
+                return;
             }
+
+
         }
     }
 }

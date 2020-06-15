@@ -16,12 +16,13 @@ namespace MinesweeperMecro
         public Form1()
         {
             InitializeComponent();
+
+            minesweeperMecro.UpdateEvent += UpdateEvent;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {              
-            minesweeperMecro.UpdateEvent += UpdateEvent;
-
+             
             minesweeperMecro.Start();
         }
 
